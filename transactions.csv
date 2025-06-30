@@ -1,0 +1,9 @@
+id_pelanggan,usia,pekerjaan,menu_dipesan,jam_beli,lama_tinggal_menit
+001,28,Desainer Grafis,Caffe Latte,14:30,45
+002,35,Programmer,Americano,09:15,90
+003,22,Mahasiswa,Caramel Macchiato,16:00,120
+004,29,Marketing,Caffe Latte,15:00,60
+005,42,Manajer Proyek,Americano,08:30,25
+006,24,Mahasiswa,Vanilla Latte,13:00,75
+007,31,Programmer,Caffe Latte,10:00,60
+008,27,Desainer Grafis,Espresso,09:00,15
