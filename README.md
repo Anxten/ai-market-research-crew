@@ -1,33 +1,70 @@
-# 🤖 AI Market Research Crew
+# 🤖 AI Business Consultant for Market Research
 
-> Sebuah sistem agen AI otonom yang dirancang untuk melakukan riset pasar secara mendalam, menganalisis data, dan memberikan rekomendasi lokasi bisnis yang strategis.
+Sebuah aplikasi command-line yang ditenagai oleh AI untuk melakukan analisis pasar dasar, menggabungkan data pelanggan internal dengan data riset kompetitor eksternal untuk menghasilkan rekomendasi strategis.
 
-Proyek ini adalah portofolio utama saya dalam merancang dan membangun sistem multi-agen yang kompleks menggunakan CrewAI untuk menyelesaikan masalah bisnis di dunia nyata.
+---
 
-## 🎯 Tujuan Proyek
+## 📈 Studi Kasus: Ekspansi "Kopi Arek"
 
-Tujuan dari sistem ini adalah untuk membantu bisnis (studi kasus: coffee shop "Kopi Arek") dalam mengambil keputusan ekspansi yang didukung oleh data. Sistem ini mengotomatiskan proses yang biasanya memakan waktu berminggu-minggu menjadi hanya beberapa jam, dengan menganalisis:
-- Profil pelanggan internal untuk menemukan "persona pelanggan ideal".
-- Data demografi eksternal dan tingkat kompetisi di lokasi target.
-- Analisis pro dan kontra dari setiap lokasi potensial untuk memberikan rekomendasi yang seimbang.
+Proyek ini lahir dari sebuah studi kasus fiktif: sebuah brand coffee shop lokal bernama "Kopi Arek" yang sukses di Surabaya ingin berekspansi ke kota baru. Mereka dihadapkan pada dua pertanyaan kunci:
+1.  Siapakah profil pelanggan setia kita saat ini?
+2.  Melihat profil tersebut, siapa kompetitor utama yang harus kita waspadai di kota baru?
 
-## 🏛️ Arsitektur Agen
+Aplikasi ini dirancang untuk menjawab pertanyaan tersebut secara otomatis menggunakan AI.
 
-Sistem ini terdiri dari tim agen AI yang berkolaborasi, masing-masing dengan peran spesifik:
+---
 
-1.  **Agen Analis Internal:** Menganalisis data transaksi internal untuk membangun profil pelanggan.
-2.  **Agen Peneliti Pasar:** Melakukan riset eksternal pada demografi dan kompetitor.
-3.  **Agen Kritikus:** Menantang dan memvalidasi hasil dari peneliti pasar untuk memastikan akurasi dan mengurangi bias.
-4.  **(Future)** Agen Finalis: Mensintesis semua data dan menyusun laporan akhir untuk pengambil keputusan manusia.
+## 🛠️ Arsitektur Solusi
 
-## 🛠️ Teknologi yang Digunakan
+Aplikasi ini menggunakan pendekatan "Orkestrasi Manual" yang andal, di mana alur kerja dikontrol oleh skrip utama untuk memastikan stabilitas dan hasil yang akurat.
 
-- Python
-- CrewAI
-- Pandas
-- LangChain
-- (Akan ditambahkan seiring berjalannya proyek)
+1.  **Analisis Data Internal:** Sebuah agen AI khusus (`create_csv_agent`) menganalisis data transaksi (`.csv`) untuk mengidentifikasi profil pelanggan.
+2.  **Analisis Data Eksternal:** Program membaca data riset kompetitor yang sudah disiapkan (`.txt`).
+3.  **Sintesis & Rekomendasi:** "Otak" utama AI (LLM Groq Llama3) menerima kedua laporan tersebut dan membuat kesimpulan akhir serta rekomendasi strategis.
 
-## 📊 Status Proyek
+---
 
-**[ Tahap Perancangan & Inisialisasi ]**
+## 💻 Tumpukan Teknologi (Tech Stack)
+
+* **Python**
+* **LangChain** (sebagai framework utama)
+* **Groq API** (dengan model Llama 3 8B sebagai LLM)
+* **Pandas** (untuk pemrosesan data)
+* **Argparse** (untuk membuat aplikasi command-line yang dinamis)
+
+---
+
+## 🚀 Instalasi & Setup
+
+1.  **Clone repositori ini:**
+    ```bash
+    git clone [https://github.com/Anxten/ai-market-research-crew.git](https://github.com/Anxten/ai-market-research-crew.git)
+    cd ai-market-research-crew
+    ```
+
+2.  **Buat dan aktifkan virtual environment:**
+    ```bash
+    python -m venv venv
+    .\venv\Scripts\activate
+    ```
+
+3.  **Install semua library yang dibutuhkan:**
+    ```bash
+    pip install -r requirements.txt 
+    # (Catatan: Anda perlu membuat file requirements.txt terlebih dahulu)
+    # Cara cepat untuk sekarang: pip install pandas langchain-groq langchain-experimental langchain-community tabulate python-dotenv
+    ```
+
+4.  **Buat file `.env` dan masukkan kunci API Anda:**
+    ```
+    GROQ_API_KEY='gsk_xxxxxxxxxxxxxxxxxx'
+    ```
+
+---
+
+## ⚙️ Cara Penggunaan
+
+Jalankan aplikasi dari terminal dengan menyediakan path ke file data pelanggan dan file data riset.
+
+```bash
+python app.py --csv [path_ke_file_csv] --riset [path_ke_file_riset]
