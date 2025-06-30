@@ -1,69 +1,62 @@
-# app.py (Versi Final - Orkestrator Manual)
+# app.py (Versi 2.0 - Aplikasi Dinamis)
 
 import os
+import pandas as pd
+import argparse # <-- PERKAKAS BARU KITA
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
-from langchain_experimental.agents.agent_toolkits import create_csv_agent
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+
+# =================================================================
+# BAGIAN BARU: MEMBUAT "LUBANG INPUT" (ARGUMENT PARSER)
+# =================================================================
+# Ini akan mendefinisikan input apa yang kita harapkan dari pengguna saat mereka menjalankan file ini
+parser = argparse.ArgumentParser(description="AI Business Consultant")
+parser.add_argument('--csv', type=str, required=True, help='Path ke file CSV data transaksi pelanggan.')
+parser.add_argument('--riset', type=str, required=True, help='Path ke file .txt berisi data riset kompetitor.')
+args = parser.parse_args()
+# =================================================================
 
 # Memuat kunci dari .env
 load_dotenv()
 
-print("Mempersiapkan Orkestrasi Multi-Langkah...")
+print("Mempersiapkan Proses Analisis Dinamis...")
 
 try:
     # 1. Definisikan LLM kita
     llm = ChatGroq(model_name="llama3-8b-8192", temperature=0)
 
-    # =================================================================
-    # LANGKAH 1: JALANKAN AGEN ANALIS DATA CSV
-    # =================================================================
-    print("\n--- [LANGKAH 1] Menjalankan Agen Analis Data CSV... ---")
-    csv_agent = create_csv_agent(llm, 'transactions.csv', allow_dangerous_code=True)
-    pertanyaan_csv = "Analisis file transactions.csv ini, lalu berikan rangkuman singkat tentang profil pelanggan utama berdasarkan pekerjaan dan menu yang paling populer."
-    hasil_analisis_csv = csv_agent.invoke({"input": pertanyaan_csv})['output']
-    
-    print("--- Laporan dari Agen Analis Data ---")
-    print(hasil_analisis_csv)
+    # 2. Baca data dari file yang ditentukan oleh pengguna
+    print(f"Membaca data pelanggan dari file: {args.csv}")
+    df = pd.read_csv(args.csv) # <-- MENGGUNAKAN INPUT DARI TERMINAL
+    data_pelanggan_str = df.to_string()
 
-    # =================================================================
-    # LANGKAH 2: BACA FILE RISET KOMPETITOR
-    # =================================================================
-    print("\n--- [LANGKAH 2] Membaca File Riset Kompetitor... ---")
-    with open('riset_kompetitor.txt', 'r') as file:
-        hasil_riset_kompetitor = file.read()
-    print("--- Laporan Riset Kompetitor ---")
-    print(hasil_riset_kompetitor)
+    print(f"Membaca data riset dari file: {args.riset}")
+    with open(args.riset, 'r') as file: # <-- MENGGUNAKAN INPUT DARI TERMINAL
+        data_kompetitor_str = file.read()
 
-    # =================================================================
-    # LANGKAH 3: SINTESIS KEDUA INFORMASI
-    # =================================================================
-    print("\n--- [LANGKAH 3] Meminta LLM Membuat Kesimpulan Akhir... ---")
-    
-    # Membuat template prompt untuk tugas akhir
-    prompt_sintesis = ChatPromptTemplate.from_template(
-        "Anda adalah seorang konsultan bisnis yang cerdas.\n"
+    # 3. Minta LLM membuat kesimpulan (langkah ini sama persis seperti sebelumnya)
+    print("Mengirim semua data ke Groq untuk dibuat kesimpulan...")
+    prompt_template = ChatPromptTemplate.from_template(
+        "Anda adalah seorang konsultan bisnis super cerdas.\n"
         "Anda memiliki dua buah laporan:\n\n"
         "Laporan 1: Analisis Pelanggan Internal\n"
         "-------------------------------------\n"
-        "{analisis_pelanggan}\n"
-        "-------------------------------------\n\n"
+        "{data_pelanggan}\n"
+        "---------------------\n\n"
         "Laporan 2: Riset Kompetitor di Pasar\n"
         "-------------------------------------\n"
-        "{riset_kompetitor}\n"
-        "-------------------------------------\n\n"
-        "Tugas Anda: Berdasarkan DUA laporan tersebut, berikan kesimpulan dan rekomendasi singkat dalam Bahasa Indonesia. "
-        "Siapakah kompetitor utama yang paling relevan dan harus diwaspadai oleh 'Kopi Arek' mengingat profil pelanggan internal mereka? Berikan alasanmu."
+        "{data_kompetitor}\n"
+        "----------------------\n\n"
+        "TUGAS AKHIR: Berdasarkan DUA set data di atas, jawab pertanyaan ini dalam Bahasa Indonesia:\n"
+        "1. Siapa profil pelanggan utama 'Kopi Arek'? (lihat dari pekerjaan & usia).\n"
+        "2. Mengingat profil pelanggan tersebut, siapa kompetitor yang paling relevan dan harus diwaspadai? Berikan alasan singkat."
     )
-
-    # Membuat rantai LangChain untuk sintesis
-    rantai_sintesis = prompt_sintesis | llm | StrOutputParser()
-
-    # Menjalankan rantai dengan memberikan kedua laporan sebagai input
-    rekomendasi_final = rantai_sintesis.invoke({
-        "analisis_pelanggan": hasil_analisis_csv,
-        "riset_kompetitor": hasil_riset_kompetitor
+    rantai_final = prompt_template | llm | StrOutputParser()
+    rekomendasi_final = rantai_final.invoke({
+        "data_pelanggan": data_pelanggan_str,
+        "data_kompetitor": data_kompetitor_str
     })
 
     print("\n\n==================== REKOMENDASI FINAL ====================")
